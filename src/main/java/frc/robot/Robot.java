@@ -57,6 +57,10 @@ public class Robot extends TimedRobot {
     controller.y().onTrue(voltageCommand(motor2, -4));
 
     controller.leftBumper().onTrue(Commands.runOnce(() -> drivetrain.resetPose(new Pose2d())));
+    controller.rightBumper().onTrue(Commands.parallel(
+      voltageCommand(motor1, 0.0),
+      voltageCommand(motor2, 0.0)
+    ));
 
     drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
