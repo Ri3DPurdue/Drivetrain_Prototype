@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,10 +51,12 @@ public class Robot extends TimedRobot {
 
   public void configureBindings() {
     controller.a().onTrue(voltageCommand(motor1, 2));
-    controller.a().onTrue(voltageCommand(motor1, -2));
+    controller.b().onTrue(voltageCommand(motor1, -2));
 
-    controller.a().onTrue(voltageCommand(motor2, 4));
-    controller.a().onTrue(voltageCommand(motor2, -4));
+    controller.x().onTrue(voltageCommand(motor2, 4));
+    controller.y().onTrue(voltageCommand(motor2, -4));
+
+    controller.leftBumper().onTrue(Commands.runOnce(() -> drivetrain.resetPose(new Pose2d())));
 
     drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
