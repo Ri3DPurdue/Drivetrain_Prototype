@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,6 +24,11 @@ public class Robot extends TimedRobot {
   public TalonFX motor1;
   public TalonFX motor2;
   public CommandXboxController controller = new CommandXboxController(0);
+
+  TunableNumber motor1ValA = new TunableNumber("Motor1ValA", 0.0, true);
+  TunableNumber motor1ValB = new TunableNumber("Motor1ValB", 0.0, true);
+  TunableNumber motor2ValX = new TunableNumber("Motor2ValX", 0.0, true);
+  TunableNumber motor2ValY = new TunableNumber("Motor2ValY", 0.0, true);
 
   public CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -42,19 +49,23 @@ public class Robot extends TimedRobot {
     return config;
   }
 
-
   public Command voltageCommand(TalonFX motor, double volts) {
+    return voltageCommand(motor, () -> volts);
+  }
+
+
+  public Command voltageCommand(TalonFX motor, Supplier<Double> volts) {
     return Commands.runOnce(() -> {
-      motor.setControl(new VoltageOut(volts));
+      motor.setControl(new VoltageOut(volts.get()));
     });
   }
 
   public void configureBindings() {
-    controller.a().onTrue(voltageCommand(motor1, 2));
-    controller.b().onTrue(voltageCommand(motor1, -2));
+    controller.a().onTrue(voltageCommand(motor1, () -> motor1ValA.get()));
+    controller.b().onTrue(voltageCommand(motor1, () -> motor1ValB.get()));
 
-    controller.x().onTrue(voltageCommand(motor2, 4));
-    controller.y().onTrue(voltageCommand(motor2, -4));
+    controller.x().onTrue(voltageCommand(motor2, () -> motor2ValX.get()));
+    controller.y().onTrue(voltageCommand(motor2, () -> motor2ValY.get()));
 
     controller.leftBumper().onTrue(Commands.runOnce(() -> drivetrain.resetPose(new Pose2d())));
     controller.rightBumper().onTrue(Commands.parallel(
