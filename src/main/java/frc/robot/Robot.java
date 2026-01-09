@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -55,9 +56,13 @@ public class Robot extends TimedRobot {
 
 
   public Command voltageCommand(TalonFX motor, Supplier<Double> volts) {
-    return Commands.runOnce(() -> {
-      motor.setControl(new VoltageOut(volts.get()));
-    });
+    return Commands.defer(
+      () -> {
+        return Commands.runOnce(() ->motor.setControl(new VoltageOut(volts.get())));
+      },
+      Set.of());
+        
+    
   }
 
   public void configureBindings() {
@@ -85,7 +90,7 @@ public class Robot extends TimedRobot {
   
 
   public Robot() {
-    motor1 = new TalonFX(10, "rio");
+    motor1 = new TalonFX(10, "Drive Train");
 
     TalonFXConfiguration motor1Config = getBasicConfig();
 
@@ -93,7 +98,7 @@ public class Robot extends TimedRobot {
 
 
 
-    motor2 = new TalonFX(11, "rio");
+    motor2 = new TalonFX(11, "Drive Train");
 
     TalonFXConfiguration motor2Config = getBasicConfig();
 
